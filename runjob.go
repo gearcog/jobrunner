@@ -16,41 +16,43 @@ import (
 	"gopkg.in/robfig/cron.v2"
 )
 
-// Callers can use jobs.Func to wrap a raw func.
-// (Copying the type to this package makes it more visible)
+// Func is used to wrap a function literal as a job.
 //
 // For example:
 //    jobrunner.Schedule("cron.frequent", jobs.Func(myFunc))
 type Func func()
 
+// Run will execute the underlying job logic
 func (r Func) Run() { r() }
 
-func Schedule(spec string, job cron.Job) error {
+// Schedule will enqueue a job with the supplied name to execute according to
+// the specification (spec) supplied.
+func Schedule(name string, spec string, job cron.Job) error {
 	sched, err := cron.Parse(spec)
 	if err != nil {
 		return err
 	}
-	MainCron.Schedule(sched, New(job))
+	MainCron.Schedule(sched, New(name, job))
 	return nil
 }
 
-// Run the given job at a fixed interval.
-// The interval provided is the time between the job ending and the job being run again.
+// Every will run the given job at a fixed interval. The interval provided is
+// the time between the job ending and the job being run again.
 // The time that the job takes to run is not included in the interval.
-func Every(duration time.Duration, job cron.Job) {
+func Every(duration time.Duration, name string, job cron.Job) {
 
-	MainCron.Schedule(cron.Every(duration), New(job))
+	MainCron.Schedule(cron.Every(duration), New(name, job))
 }
 
-// Run the given job right now.
-func Now(job cron.Job) {
-	go New(job).Run()
+// Now will run the given job immediately.
+func Now(name string, job cron.Job) {
+	go New(name, job).Run()
 }
 
-// Run the given job once, after the given delay.
-func In(duration time.Duration, job cron.Job) {
+// In will run the given job once, after the given delay.
+func In(duration time.Duration, name string, job cron.Job) {
 	go func() {
 		time.Sleep(duration)
-		New(job).Run()
+		New(name, job).Run()
 	}()
 }
