@@ -3,7 +3,6 @@ package jobrunner
 import (
 	"bytes"
 	"log"
-	"reflect"
 	"runtime/debug"
 	"sync"
 	"sync/atomic"
@@ -12,8 +11,9 @@ import (
 	"gopkg.in/robfig/cron.v2"
 )
 
+// Job defines the jobs to be executed.
 type Job struct {
-	Name    string
+	Name    string // well-known name of the job; need not be unique
 	inner   cron.Job
 	status  uint32
 	Status  string
@@ -21,19 +21,16 @@ type Job struct {
 	running sync.Mutex
 }
 
-const UNNAMED = "(unnamed)"
-
-func New(job cron.Job) *Job {
-	name := reflect.TypeOf(job).Name()
-	if name == "Func" {
-		name = UNNAMED
-	}
+// New creates a new job with the given name.
+func New(name string, job cron.Job) *Job {
 	return &Job{
 		Name:  name,
 		inner: job,
 	}
 }
 
+// StatusUpdate returns the current status of the job; either 'RUNNING' or
+// 'IDLE'.
 func (j *Job) StatusUpdate() string {
 	if atomic.LoadUint32(&j.status) > 0 {
 		j.Status = "RUNNING"
@@ -44,6 +41,7 @@ func (j *Job) StatusUpdate() string {
 
 }
 
+// Run starts the execution of the job.
 func (j *Job) Run() {
 	start := time.Now()
 	// If the job panics, just print a stack trace.
