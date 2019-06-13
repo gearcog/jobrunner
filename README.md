@@ -17,7 +17,7 @@ import "github.com/bamzi/jobrunner"
 
 func main() {
     jobrunner.Start() // optional: jobrunner.Start(pool int, concurrent int) (10, 1)
-    jobrunner.Schedule("@every 5s", ReminderEmails{})
+    jobrunner.Schedule("Email reminders", "@every 5s", ReminderEmails{})
 }
 
 // Job Specific Functions
@@ -56,7 +56,7 @@ func main() {
 
 func JobJson(c *gin.Context) {
     // returns a map[string]interface{} that can be marshalled as JSON
-    c.JSON(200, jobrunner.StatusJson())
+    c.JSON(200, jobrunner.StatusJSON())
 }
 
 func JobHtml(c *gin.Context) {
@@ -112,12 +112,12 @@ JobRunner is designed to be framework agnostic. So it will work with pure Go app
 ## Basics
 
 ```go
-    jobrunner.Schedule("* */5 * * * *", DoSomething{}) // every 5min do something
-    jobrunner.Schedule("@every 1h30m10s", ReminderEmails{})
-    jobrunner.Schedule("@midnight", DataStats{}) // every midnight do this..
-    jobrunner.Every(16*time.Minute, CleanS3{}) // evey 16 min clean...
-    jobrunner.In(10*time.Second, WelcomeEmail{}) // one time job. starts after 10sec
-    jobrunner.Now(NowDo{}) // do the job as soon as it's triggered
+    jobrunner.Schedule("* */5 * * * *", "Do something", DoSomething{}) // every 5min do something
+    jobrunner.Schedule("@every 1h30m10s", "Email reminders", ReminderEmails{})
+    jobrunner.Schedule("@midnight", "Data stats", DataStats{}) // every midnight do this..
+    jobrunner.Every(16*time.Minute, "Clean S3", CleanS3{}) // evey 16 min clean...
+    jobrunner.In(10*time.Second, "Welcome email", WelcomeEmail{}) // one time job. starts after 10sec
+    jobrunner.Now("Now do something", NowDo{}) // do the job as soon as it's triggered
 ```
 [**More Detailed CRON Specs**](https://github.com/robfig/cron/blob/v2/doc.go)
 
