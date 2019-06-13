@@ -17,7 +17,7 @@ import "github.com/bamzi/jobrunner"
 
 func main() {
     jobrunner.Start() // optional: jobrunner.Start(pool int, concurrent int) (10, 1)
-    jobrunner.Schedule("Email reminders", "@every 5s", ReminderEmails{})
+    jobrunner.Schedule("@every 5s", "Email reminders", ReminderEmails{})
 }
 
 // Job Specific Functions
