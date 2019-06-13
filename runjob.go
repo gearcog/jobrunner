@@ -27,7 +27,7 @@ func (r Func) Run() { r() }
 
 // Schedule will enqueue a job with the supplied name to execute according to
 // the specification (spec) supplied.
-func Schedule(name string, spec string, job cron.Job) error {
+func Schedule(spec string, name string, job cron.Job) error {
 	sched, err := cron.Parse(spec)
 	if err != nil {
 		return err
